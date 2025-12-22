@@ -7,6 +7,7 @@ from .connection import (
     get_session,
 )
 from .models import Base, RealTimeQuote
+from .repository import QuoteRepository, QuoteSchema
 
 __version__ = "0.1.0"
 
@@ -17,4 +18,6 @@ __all__ = [
     "get_engine",
     "get_session",
     "create_session_factory",
+    "QuoteRepository",
+    "QuoteSchema",
 ]
