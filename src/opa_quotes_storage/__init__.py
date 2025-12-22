@@ -6,6 +6,7 @@ from .connection import (
     get_engine,
     get_session,
 )
+from .health import HealthChecker
 from .models import Base, RealTimeQuote
 from .repository import QuoteRepository, QuoteSchema
 
@@ -20,4 +21,5 @@ __all__ = [
     "create_session_factory",
     "QuoteRepository",
     "QuoteSchema",
+    "HealthChecker",
 ]
