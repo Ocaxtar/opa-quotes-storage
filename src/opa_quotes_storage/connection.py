@@ -11,23 +11,20 @@ from sqlalchemy.orm import Session, sessionmaker
 def get_connection_string() -> str:
     """
     Get database connection string from environment.
-    
+
     Returns:
         PostgreSQL connection string
     """
-    return os.getenv(
-        "DATABASE_URL",
-        "postgresql://opa_user:opa_password@localhost:5432/opa_quotes"
-    )
+    return os.getenv("DATABASE_URL", "postgresql://opa_user:opa_password@localhost:5432/opa_quotes")
 
 
 def get_engine(connection_string: Optional[str] = None) -> Engine:
     """
     Create SQLAlchemy engine.
-    
+
     Args:
         connection_string: Optional custom connection string
-        
+
     Returns:
         SQLAlchemy Engine instance
     """
@@ -44,10 +41,10 @@ def get_engine(connection_string: Optional[str] = None) -> Engine:
 def get_session(engine: Optional[Engine] = None) -> Session:
     """
     Create database session.
-    
+
     Args:
         engine: Optional custom engine instance
-        
+
     Returns:
         SQLAlchemy Session instance
     """
@@ -59,10 +56,10 @@ def get_session(engine: Optional[Engine] = None) -> Session:
 def create_session_factory(engine: Optional[Engine] = None) -> sessionmaker:
     """
     Create session factory for dependency injection.
-    
+
     Args:
         engine: Optional custom engine instance
-        
+
     Returns:
         Session factory (sessionmaker)
     """

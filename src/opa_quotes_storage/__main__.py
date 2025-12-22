@@ -7,14 +7,14 @@ import sys
 from .health import HealthChecker
 
 
-def main():
+def main():  # pragma: no cover
     """Run health checks and print results."""
     checker = HealthChecker()
     health = checker.check_all()
-    
+
     # Pretty print JSON
     print(json.dumps(health, indent=2))
-    
+
     # Exit code based on overall status
     if health["overall_status"] == "healthy":
         sys.exit(0)
@@ -22,5 +22,5 @@ def main():
         sys.exit(1)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()

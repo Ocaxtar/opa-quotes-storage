@@ -15,15 +15,15 @@ def report_to_supervisor():
     """Report health in format compatible with supervisor monitoring."""
     checker = HealthChecker()
     health = checker.check_all()
-    
+
     # Format for supervisor's ecosystem_status.py
     output = {
         "repository": "opa-quotes-storage",
         "status": health["overall_status"],
         "timestamp": health["timestamp"],
-        "checks": health["checks"]
+        "checks": health["checks"],
     }
-    
+
     print(json.dumps(output, indent=2))
 
 

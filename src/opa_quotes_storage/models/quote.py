@@ -1,10 +1,7 @@
 """SQLAlchemy model for real-time market quotes."""
 
-from datetime import datetime
-from decimal import Decimal
-from typing import Optional
 
-from sqlalchemy import BigInteger, Column, NUMERIC, Text, TIMESTAMP
+from sqlalchemy import NUMERIC, TIMESTAMP, BigInteger, Column, Text
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
@@ -13,7 +10,7 @@ Base = declarative_base()
 class RealTimeQuote(Base):
     """
     Model for real-time market quotes stored in TimescaleDB hypertable.
-    
+
     Attributes:
         symbol: Stock ticker symbol (e.g., 'AAPL', 'MSFT')
         timestamp: Quote timestamp (UTC)
@@ -26,35 +23,35 @@ class RealTimeQuote(Base):
         ask: Ask price
         source: Data source (e.g., 'yfinance', 'tiingo')
     """
-    
+
     __tablename__ = "real_time"
     __table_args__ = {"schema": "quotes"}
-    
+
     # Primary key compuesta (symbol, timestamp)
     symbol = Column(Text, primary_key=True, nullable=False)
     timestamp = Column(TIMESTAMP(timezone=True), primary_key=True, nullable=False)
-    
+
     # OHLC data
     open = Column(NUMERIC(10, 2))
     high = Column(NUMERIC(10, 2))
     low = Column(NUMERIC(10, 2))
     close = Column(NUMERIC(10, 2))
-    
+
     # Volume and bid/ask
     volume = Column(BigInteger)
     bid = Column(NUMERIC(10, 2))
     ask = Column(NUMERIC(10, 2))
-    
+
     # Metadata
     source = Column(Text)
-    
+
     def __repr__(self) -> str:
         """String representation of the quote."""
         return (
             f"<RealTimeQuote(symbol={self.symbol}, "
             f"timestamp={self.timestamp}, close={self.close})>"
         )
-    
+
     def to_dict(self) -> dict:
         """Convert quote to dictionary."""
         return {
