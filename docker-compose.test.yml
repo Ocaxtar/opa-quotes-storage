@@ -1,0 +1,25 @@
+version: '3.9'
+
+services:
+  timescaledb-test:
+    image: timescale/timescaledb:latest-pg14
+    container_name: opa-quotes-storage-test
+    ports:
+      - "5433:5432"  # Evitar conflicto con dev
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: test_opa_quotes
+    tmpfs:
+      - /var/lib/postgresql/data  # In-memory para tests rápidos
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d test_opa_quotes"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    networks:
+      - opa-test-network
+
+networks:
+  opa-test-network:
+    driver: bridge
