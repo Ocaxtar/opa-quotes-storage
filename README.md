@@ -51,15 +51,39 @@ Persistent storage service for high-frequency market quotes using TimescaleDB (P
 # 1. Install dependencies
 poetry install
 
-# 2. Start TimescaleDB
-docker-compose up -d
+# 2. Start TimescaleDB (development)
+make dev-up
 
-# 3. Run migrations
+# Alternative: Manual start
+docker-compose up -d
+poetry run python scripts/setup/check_health.py
 poetry run alembic upgrade head
 
-# 4. Verify setup
+# 3. Verify setup
 poetry run python -m opa_quotes_storage.health
 ```
+
+### Testing Environment
+
+```bash
+# Start test database (in-memory, port 5433)
+make test-up
+
+# Run integration tests
+make test
+
+# Stop test database
+make test-down
+```
+
+### Available Make Commands
+
+- `make dev-up`: Start development environment (TimescaleDB + migrations)
+- `make dev-down`: Stop development environment
+- `make test-up`: Start test environment
+- `make test-down`: Stop test environment
+- `make test`: Run full integration test suite
+- `make clean`: Remove all containers and volumes
 
 ## 📊 Usage
 
@@ -103,9 +127,15 @@ quotes = repo.get_intraday_quotes(
 poetry run pytest tests/unit -v
 
 # Integration tests (requires TimescaleDB)
+make test
+
+# Alternative: Manual testing
 docker-compose -f docker-compose.test.yml up -d
 poetry run pytest tests/integration -v
 docker-compose -f docker-compose.test.yml down -v
+
+# Run health check script
+poetry run python scripts/setup/check_health.py
 ```
 
 ## 📈 Performance
@@ -158,10 +188,11 @@ poetry run alembic downgrade -1
 
 **Fase 1** (Current):
 - [x] Basic scaffolding (OPA-149)
-- [ ] SQLAlchemy models + Alembic migrations
-- [ ] QuoteRepository with bulk insert
-- [ ] Health checks and monitoring
-- [ ] Integration tests with TimescaleDB
+- [x] Docker Compose con TimescaleDB (OPA-185)
+- [ ] SQLAlchemy models + Alembic migrations (OPA-182, OPA-186)
+- [ ] QuoteRepository with bulk insert (OPA-187)
+- [ ] Health checks and monitoring (OPA-183)
+- [ ] CI/CD (OPA-184)
 
 **Fase 2**:
 - [ ] Continuous aggregates (1min → 1hour → 1day)
