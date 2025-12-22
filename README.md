@@ -1,5 +1,10 @@
 # opa-quotes-storage
 
+![CI Status](https://github.com/Ocaxtar/opa-quotes-storage/workflows/CI/badge.svg)
+[![codecov](https://codecov.io/gh/Ocaxtar/opa-quotes-storage/branch/main/graph/badge.svg)](https://codecov.io/gh/Ocaxtar/opa-quotes-storage)
+![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 **TimescaleDB storage layer for real-time market quotes**
 
 Part of [OPA_Machine](https://github.com/Ocaxtar/OPA_Machine) ecosystem - Módulo 5 (Cotización)

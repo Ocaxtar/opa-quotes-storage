@@ -1,0 +1,120 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      
+      - name: Install dependencies
+        run: poetry install
+      
+      - name: Run ruff check
+        run: poetry run ruff check .
+      
+      - name: Run ruff format check
+        run: poetry run ruff format --check .
+
+  test-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      
+      - name: Install dependencies
+        run: poetry install
+      
+      - name: Run unit tests
+        run: poetry run pytest tests/unit -v --cov=src --cov-report=xml
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  test-integration:
+    runs-on: ubuntu-latest
+    services:
+      timescaledb:
+        image: timescale/timescaledb:latest-pg14
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: test_opa_quotes
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U test_user -d test_opa_quotes"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      
+      - name: Install dependencies
+        run: poetry install
+      
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      
+      - name: Wait for TimescaleDB
+        run: |
+          until pg_isready -h localhost -U test_user -d test_opa_quotes; do
+            echo "Waiting for TimescaleDB..."
+            sleep 2
+          done
+      
+      - name: Run migrations
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_opa_quotes
+        run: poetry run alembic upgrade head
+      
+      - name: Run integration tests
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_opa_quotes
+        run: poetry run pytest tests/integration -v --cov=src --cov-report=xml
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: integration
+          token: ${{ secrets.CODECOV_TOKEN }}
