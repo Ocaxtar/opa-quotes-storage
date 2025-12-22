@@ -118,12 +118,18 @@ poetry run pytest tests/integration -v    # Con DB
 1. **Leer TODOS los comentarios** de la issue antes de comenzar
 2. Verificar dependencias con otros repositorios (contratos en supervisor)
 3. Mover issue a "In Progress" en Linear
-4. Trabajar en rama: `oscarcalvo/OPA-XXX-descripcion-corta`
+4. Trabajar en rama: `oscarcalvovaquero/OPA-XXX-descripcion-corta`
 5. Ejecutar tests antes de commit
 6. Commit con mensaje: `OPA-XXX: Descripción clara`
 7. Push a GitHub
 8. **Añadir comentario de cierre** con prefijo `🤖 Agente opa-quotes-storage:`
-9. Mover a "Done" solo DESPUÉS de verificar archivos en GitHub
+9. **Merge automático a main**:
+   ```bash
+   git checkout main
+   git merge oscarcalvovaquero/OPA-XXX-descripcion-corta --no-ff -m "Merge OPA-XXX: Descripción"
+   git push origin main
+   ```
+10. Mover a "Done" solo DESPUÉS de verificar merge en GitHub
 
 ## Convenciones de Código
 
