@@ -122,14 +122,32 @@ poetry run pytest tests/integration -v    # Con DB
 5. Ejecutar tests antes de commit
 6. Commit con mensaje: `OPA-XXX: Descripción clara`
 7. Push a GitHub
-8. **Añadir comentario de cierre** con prefijo `🤖 Agente opa-quotes-storage:`
-9. **Merge automático a main**:
+8. **OBLIGATORIO: Mergear a main al completar la issue (antes de mover a Done)**
    ```bash
+   # 1. Asegurar que todos los cambios están commiteados
+   git status  # Debe estar limpio
+   
+   # 2. Actualizar main local
    git checkout main
-   git merge oscarcalvovaquero/OPA-XXX-descripcion-corta --no-ff -m "Merge OPA-XXX: Descripción"
+   git pull origin main
+   
+   # 3. Mergear branch a main (squash para historia limpia)
+   git merge --squash oscarcalvovaquero/OPA-XXX-descripcion-corta
+   
+   # 4. Commit final con mensaje de issue
+   git commit -m "OPA-XXX: Descripción completa de la feature/fix"
+   
+   # 5. Pushear a GitHub
    git push origin main
+   
+   # 6. Eliminar branch local y remota
+   git branch -d oscarcalvovaquero/OPA-XXX-descripcion-corta
+   git push origin --delete oscarcalvovaquero/OPA-XXX-descripcion-corta 2>/dev/null || true
    ```
-10. Mover a "Done" solo DESPUÉS de verificar merge en GitHub
+9. **Añadir comentario de cierre** con prefijo `🤖 Agente opa-quotes-storage:`
+10. **Solo ENTONCES**: Mover a "Done" en Linear
+
+**⚠️ REGLA CRÍTICA**: NO cerrar issue si la branch no está mergeada. Ramas sin mergear = trabajo perdido.
 
 ## Convenciones de Código
 
