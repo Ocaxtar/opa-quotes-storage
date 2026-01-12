@@ -10,6 +10,173 @@
 **Repositorio GitHub**: https://github.com/Ocaxtar/opa-quotes-storage  
 **Proyecto Linear**: opa-quotes-storage
 
+## 🔧 Gestión de Tools MCP
+
+Este repositorio utiliza **Model Context Protocol (MCP)** para integración con Linear y GitHub.
+
+### Activación de Tools
+
+**REGLA CRÍTICA**: Tools MCP se activan **on-demand** por categoría funcional. NO están disponibles por defecto.
+
+#### Linear Tools
+
+Para trabajar con issues, comentarios, proyectos o equipos:
+
+```python
+# ✅ CORRECTO: Activar categoría necesaria
+<invoke name="activate_issue_management_tools">  # Para crear/editar issues
+<invoke name="activate_workspace_overview_tools"> # Para listar proyectos/equipos
+<invoke name="activate_issue_tracking_tools">    # Para consultar estado de issues
+
+# ❌ INCORRECTO: Intentar usar tool sin activar categoría
+<invoke name="mcp_linear_create_issue">  # Error: Tool no disponible
+```
+
+#### GitHub Tools
+
+Para trabajar con PRs, branches, commits o archivos remotos:
+
+```python
+# ✅ CORRECTO: Activar categoría necesaria
+<invoke name="activate_repository_management_tools">  # Para crear branches/PRs
+<invoke name="activate_file_management_tools">        # Para leer/editar archivos remotos
+
+# ❌ INCORRECTO: Asumir que tools están disponibles
+<invoke name="mcp_github-mcp_create_or_update_file">  # Error: Tool no disponible
+```
+
+### Categorías Disponibles
+
+**Linear**:
+- `activate_issue_management_tools`: Crear/editar issues, comentarios, labels, proyectos
+- `activate_document_management_tools`: Gestionar documentos de Linear
+- `activate_issue_tracking_tools`: Consultar estado, adjuntos, branches asociados
+- `activate_workspace_overview_tools`: Listar proyectos, equipos, usuarios, labels
+- `activate_team_and_user_management_tools`: Info detallada de equipos y usuarios
+
+**GitHub**:
+- `activate_repository_management_tools`: Crear repos, branches, PRs, merge
+- `activate_pull_request_review_tools`: Gestionar reviews de PRs
+- `activate_file_management_tools`: Leer/editar/eliminar archivos remotos
+- `activate_repository_information_tools`: Info de commits, releases, issues
+- `activate_branch_and_commit_tools`: Listar branches, historial de commits
+
+### Workflow Típico
+
+```python
+# 1. Usuario pide: "Resuelve OPA-234"
+
+# 2. Activar Linear tools para leer issue
+<invoke name="activate_issue_tracking_tools">
+
+# 3. Leer issue (ahora disponible)
+<invoke name="mcp_linear_get_issue">
+  <parameter name="id">OPA-234</parameter>
+</invoke>
+
+# 4. Trabajar en la issue
+# ... implementación ...
+
+# 5. Actualizar estado en Linear
+<invoke name="mcp_linear_update_issue">
+  <parameter name="id">OPA-234</parameter>
+  <parameter name="state">Done</parameter>
+</invoke>
+```
+
+### Recuperación de Errores
+
+Si un tool falla por no estar activado:
+
+```python
+# Error: "Tool mcp_linear_create_issue not available"
+
+# Solución:
+<invoke name="activate_issue_management_tools"></invoke>
+# Ahora reintentar
+<invoke name="mcp_linear_create_issue">...</invoke>
+```
+
+## 🛡️ Validación de Convenciones
+
+Antes de ejecutar cualquier acción que pueda violar convenciones del repositorio, **DETENTE** y verifica:
+
+### Checkpoint Obligatorio Pre-Acción
+
+Antes de:
+- Crear/editar archivos
+- Ejecutar comandos
+- Hacer commits
+- Mergear branches
+
+**VERIFICA**:
+
+1. **Naming conventions** (archivo AGENTS.md actual)
+   - ¿El nombre de archivo sigue las reglas?
+   - ¿La estructura de carpetas es correcta?
+
+2. **Workflow de issues** (sección "Para Issues")
+   - ¿La branch tiene el formato correcto?
+   - ¿El commit message sigue la convención?
+   - ¿Es necesario mergear a main antes de cerrar?
+
+3. **Testing requirements**
+   - ¿Los tests pasan antes del commit?
+   - ¿El coverage es >80%?
+
+4. **Contratos de integración**
+   - ¿Los cambios afectan interfaces compartidas?
+   - ¿Se actualizó el contrato en supervisor?
+
+### Ejemplo de Validación
+
+```python
+# Usuario: "Crea un archivo para validaciones"
+
+# ❌ INCORRECTO: Crear directamente sin validar
+<invoke name="create_file">
+  <parameter name="filePath">validator.py</parameter>  # ¿Dónde va este archivo?
+</invoke>
+
+# ✅ CORRECTO: Validar estructura primero
+# 1. Leer AGENTS.md sección "Estructura de Archivos"
+<invoke name="read_file">
+  <parameter name="filePath">AGENTS.md</parameter>
+  <parameter name="startLine">100</parameter>
+  <parameter name="endLine">120</parameter>
+</invoke>
+
+# 2. Confirmar ubicación correcta: src/opa_quotes_storage/validators.py
+<invoke name="create_file">
+  <parameter name="filePath">src/opa_quotes_storage/validators.py</parameter>
+  ...
+</invoke>
+```
+
+### Recovery Workflow
+
+Si detectas que violaste una convención:
+
+1. **PAUSAR** inmediatamente
+2. **REVERTIR** cambios incorrectos
+3. **RE-VALIDAR** contra AGENTS.md
+4. **REINTENTAR** con enfoque correcto
+
+```python
+# Detectaste: archivo creado en ubicación incorrecta
+
+# 1. Eliminar archivo incorrecto
+<invoke name="run_in_terminal">
+  <parameter name="command">rm validators.py</parameter>
+</invoke>
+
+# 2. Crear en ubicación correcta
+<invoke name="create_file">
+  <parameter name="filePath">src/opa_quotes_storage/validators.py</parameter>
+  ...
+</invoke>
+```
+
 ## Contexto del Módulo
 
 Este repositorio es el **storage layer** del Módulo 5 (Cotización), que maneja almacenamiento persistente de cotizaciones de mercado en tiempo real usando TimescaleDB. Es la base de datos compartida para:
