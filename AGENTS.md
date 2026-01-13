@@ -8,7 +8,20 @@
 **Fase**: Fase 1  
 **Tipo**: Storage service (TimescaleDB)  
 **Repositorio GitHub**: https://github.com/Ocaxtar/opa-quotes-storage  
-**Proyecto Linear**: opa-quotes-storage
+**Proyecto Linear**: opa-quotes-storage  
+**Label Linear**: `opa-quotes-storage`
+
+## 📚 Guías Especializadas (CONSULTAR PRIMERO)
+
+Antes de implementar cualquier cambio, consultar estas guías del repositorio supervisor:
+
+| Guía | Propósito | Cuándo consultar |
+|------|-----------|------------------|
+| **[workflow-git-linear.md](https://github.com/Ocaxtar/OPA_Machine/blob/main/docs/guides/workflow-git-linear.md)** | Workflow Git+Linear completo | Al trabajar en issues (branch, commit, merge, cierre) |
+| **[multi-workspace-guide.md](https://github.com/Ocaxtar/OPA_Machine/blob/main/docs/guides/multi-workspace-guide.md)** | Arquitectura 20 repos, coordinación | Al crear repos, issues cross-repo, labels Linear |
+| **[code-conventions.md](https://github.com/Ocaxtar/OPA_Machine/blob/main/docs/guides/code-conventions.md)** | Estándares código, testing, CI/CD | Al escribir código, configurar tests, Docker |
+| **[technology-stack.md](https://github.com/Ocaxtar/OPA_Machine/blob/main/docs/guides/technology-stack.md)** | Stack tecnológico consolidado | Al elegir librerías, evaluar rendimiento |
+| **[linear-mcp-quickstart.md](https://github.com/Ocaxtar/OPA_Machine/blob/main/docs/guides/linear-mcp-quickstart.md)** | Errores comunes Linear MCP | Al usar mcp_linear tools (errores, fixes) |
 
 ## 🔧 Gestión de Tools MCP (Linear, GitHub)
 
@@ -64,6 +77,28 @@ mcp_linear_create_comment(issueId="OPA-XXX", body="...")
 4. **Tests**: DEBEN ejecutarse antes de marcar Done (coverage >80%)
 5. **Merges**: OBLIGATORIO mergear a main antes de cerrar issue
 
+### 📝 Comentarios vs Descripción en Issues
+
+**PRINCIPIO**: La **descripción** de una issue es la **especificación inicial**. Los **comentarios** son el **registro de progreso**.
+
+| Acción | Tool Correcta | Tool Incorrecta |
+|--------|---------------|-----------------|
+| Reportar avance parcial | `mcp_linear_create_comment()` | ❌ `mcp_linear_update_issue(body=...)` |
+| Reactivar issue cerrada | `mcp_linear_create_comment()` + `update_issue(state="In Progress")` | ❌ Solo modificar descripción |
+| Documentar error encontrado | `mcp_linear_create_comment()` | ❌ Editar descripción |
+| Añadir diagnóstico | `mcp_linear_create_comment()` | ❌ Modificar descripción |
+| Cerrar con resumen | `mcp_linear_create_comment()` + `update_issue(state="Done")` | ❌ Solo cambiar estado |
+
+**¿Por qué?**:
+- **Trazabilidad**: Comentarios tienen timestamps automáticos → historial auditable
+- **Notificaciones**: Comentarios notifican a watchers → mejor colaboración
+- **Reversibilidad**: Descripción original preservada → contexto no se pierde
+
+**¿Cuándo SÍ modificar descripción?**:
+- ✅ Corregir typos en la especificación original
+- ✅ Añadir criterios de aceptación faltantes (antes de empezar trabajo)
+- ❌ NUNCA para reportar progreso, errores o reactivaciones
+
 ### Checkpoint Pre-Acción
 
 Si detectas violación, **DETENER** y devolver control al usuario:
@@ -91,6 +126,8 @@ Este repositorio es el **storage layer** del Módulo 5 (Cotización), que maneja
 2. **opa-capacity-compute** (downstream): Consume quotes históricas para Event Vectors
 3. **opa-prediction-features** (downstream): Feature engineering desde series de precios
 4. **opa-quotes-api** (downstream): Servicio REST para consultas de quotes
+
+**Ver**: `docs/ECOSYSTEM_CONTEXT.md` para diagrama completo de posición en el ecosistema.
 
 ## Responsabilidades
 
@@ -240,6 +277,8 @@ opa-quotes-storage/
 ├── tests/
 │   ├── unit/                  # Tests sin DB
 │   └── integration/           # Tests con TimescaleDB
+├── docs/
+│   └── ECOSYSTEM_CONTEXT.md   # Posición en ecosistema
 ├── docker-compose.yml         # TimescaleDB local
 ├── pyproject.toml             # Dependencies
 └── README.md                  # Documentación
@@ -431,4 +470,4 @@ SELECT * FROM timescaledb_information.hypertable;
 ---
 
 📝 **Este documento debe actualizarse conforme evolucione el repositorio**  
-**Última sincronización con supervisor**: 2025-12-22
+**Última sincronización con supervisor**: 2026-01-13
