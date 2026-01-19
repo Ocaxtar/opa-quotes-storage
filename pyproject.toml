@@ -24,7 +24,7 @@ pytest-cov = "^7.0"
 pytest-asyncio = "^0.23"
 ruff = "^0.1"
 mypy = "^1.7"
-httpx = "^0.25"  # For testing
+httpx = "^0.28"  # For testing
 
 [tool.poetry.scripts]
 opa_quotes_storage = "opa_quotes_storage.main:main"
