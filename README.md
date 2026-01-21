@@ -7,7 +7,7 @@
 
 **TimescaleDB storage layer for real-time market quotes**
 
-Part of [OPA_Machine](https://github.com/Ocaxtar/OPA_Machine) ecosystem - Módulo 5 (Cotización)
+Part of [OPA_Machine](https://github.com/Ocaxtar/opa-supervisor) ecosystem - Módulo 5 (Cotización)
 
 ## 🎯 Purpose
 
