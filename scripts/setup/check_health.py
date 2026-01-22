@@ -21,7 +21,7 @@ def check_timescaledb_health(retries: int = 5) -> bool:
         try:
             conn = psycopg2.connect(
                 host="localhost",
-                port=5432,
+                port=5433,
                 user="opa_user",
                 password="opa_password",
                 database="opa_quotes",

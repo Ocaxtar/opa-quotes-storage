@@ -20,11 +20,11 @@ class TestConnectionManagement:
         """Test default connection string."""
         with patch.dict(os.environ, {}, clear=True):
             conn_str = get_connection_string()
-            assert conn_str == "postgresql://opa_user:opa_password@localhost:5432/opa_quotes"
+            assert conn_str == "postgresql://opa_user:opa_password@localhost:5433/opa_quotes"
 
     def test_get_connection_string_from_env(self):
         """Test connection string from environment variable."""
-        custom_url = "postgresql://custom_user:custom_pass@db:5432/custom_db"
+        custom_url = "postgresql://custom_user:custom_pass@db:5433/custom_db"
         with patch.dict(os.environ, {"DATABASE_URL": custom_url}):
             conn_str = get_connection_string()
             assert conn_str == custom_url
@@ -36,12 +36,12 @@ class TestConnectionManagement:
 
     def test_get_engine_with_custom_connection_string(self):
         """Test creating engine with custom connection string."""
-        custom_url = "postgresql://test_user:test_pass@localhost:5432/test_db"
+        custom_url = "postgresql://test_user:test_pass@localhost:5433/test_db"
         engine = get_engine(connection_string=custom_url)
         assert isinstance(engine, Engine)
         # Password is masked in URL string representation
         assert "test_user" in str(engine.url)
-        assert "localhost:5432/test_db" in str(engine.url)
+        assert "localhost:5433/test_db" in str(engine.url)
 
     def test_get_session_returns_session(self):
         """Test that get_session returns a valid Session."""

@@ -52,7 +52,7 @@ def db_connection():
     import psycopg2
 
     conn = psycopg2.connect(
-        host="localhost", port=5432, user="opa_user", password="opa_password", database="opa_quotes"
+        host="localhost", port=5433, user="opa_user", password="opa_password", database="opa_quotes"
     )
     yield conn
     conn.close()

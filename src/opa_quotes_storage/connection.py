@@ -15,7 +15,7 @@ def get_connection_string() -> str:
     Returns:
         PostgreSQL connection string
     """
-    return os.getenv("DATABASE_URL", "postgresql://opa_user:opa_password@localhost:5432/opa_quotes")
+    return os.getenv("DATABASE_URL", "postgresql://opa_user:opa_password@localhost:5433/opa_quotes")
 
 
 def get_engine(connection_string: Optional[str] = None) -> Engine:

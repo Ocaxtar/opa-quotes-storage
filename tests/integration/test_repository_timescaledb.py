@@ -288,7 +288,7 @@ def db_session():
     from sqlalchemy.orm import sessionmaker
 
     # Create engine
-    engine = create_engine("postgresql://opa_user:opa_password@localhost:5432/opa_quotes")
+    engine = create_engine("postgresql://opa_user:opa_password@localhost:5433/opa_quotes")
 
     # Create session
     Session = sessionmaker(bind=engine)

@@ -107,7 +107,7 @@ class TestQuoteRepository:
         count = repo.bulk_insert(quotes)
 
         assert count == 1
-        assert mock_session.bulk_save_objects.called
+        assert mock_session.execute.called
         assert mock_session.commit.called
 
     def test_bulk_insert_multiple_quotes(self):
@@ -127,6 +127,8 @@ class TestQuoteRepository:
         count = repo.bulk_insert(quotes)
 
         assert count == 10
+        assert mock_session.execute.called
+        assert mock_session.commit.called
 
     def test_get_quotes_builds_correct_query(self):
         """Test that get_quotes builds correct SQLAlchemy query."""

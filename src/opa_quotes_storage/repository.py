@@ -5,7 +5,7 @@ from decimal import Decimal
 from typing import Any, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
-from sqlalchemy import and_, select
+from sqlalchemy import and_, insert, select
 from sqlalchemy.orm import Session
 
 from .models import RealTimeQuote
@@ -61,13 +61,14 @@ class QuoteRepository:
         """
         self.session = session
 
-    def bulk_insert(self, quotes: list[dict[str, Any]]) -> int:
+    def bulk_insert(self, quotes: list[dict[str, Any]], batch_size: int | None = 1000) -> int:
         """
         Insert batch of quotes efficiently with validation.
 
         Args:
-            quotes: List of dicts with keys: symbol, timestamp, open, high,
-                   low, close, volume, bid, ask, source
+                 quotes: List of dicts with keys: symbol, timestamp, open, high,
+                     low, close, volume, bid, ask, source
+                 batch_size: Number of records per insert batch (None for all)
 
         Returns:
             Number of quotes inserted
@@ -86,17 +87,26 @@ class QuoteRepository:
             >>> print(count)
             1
         """
+        if not quotes:
+            return 0
+
         # Validate with Pydantic
         validated = [QuoteSchema(**q).model_dump() for q in quotes]
 
-        # Create model objects
-        quote_objects = [RealTimeQuote(**q) for q in validated]
+        if not validated:
+            return 0
 
-        # Bulk insert
-        self.session.bulk_save_objects(quote_objects)
+        stmt = insert(RealTimeQuote)
+
+        if batch_size is None or batch_size <= 0:
+            batch_size = len(validated)
+
+        for i in range(0, len(validated), batch_size):
+            self.session.execute(stmt, validated[i : i + batch_size])
+
         self.session.commit()
 
-        return len(quote_objects)
+        return len(validated)
 
     def get_quotes(
         self, symbol: str, start_date: datetime, end_date: datetime, limit: Optional[int] = None
