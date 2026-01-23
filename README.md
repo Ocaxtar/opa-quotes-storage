@@ -28,15 +28,23 @@ Persistent storage service for high-frequency market quotes using TimescaleDB (P
 ### Database Schema
 
 **Hypertable**: `quotes.real_time` (partitioned by time)
-- `symbol` (TEXT) - Ticker symbol
+- `ticker` (VARCHAR) - Ticker symbol
 - `timestamp` (TIMESTAMPTZ) - Quote timestamp (partition key)
 - `open`, `high`, `low`, `close` (NUMERIC) - OHLC data
 - `volume` (BIGINT) - Trading volume
 - `bid`, `ask` (NUMERIC) - Bid/Ask prices
 - `source` (TEXT) - Data provider (yfinance, Tiingo, etc.)
 
+**Hypertable**: `quotes.ohlcv_daily` (partitioned by date)
+- `ticker` (VARCHAR) - Ticker symbol
+- `date` (DATE) - Quote date (partition key)
+- `open`, `high`, `low`, `close` (FLOAT) - OHLC data
+- `adj_close` (FLOAT) - Adjusted close (splits/dividends)
+- `volume` (BIGINT) - Trading volume
+
 **Indexes**:
-- Primary: `(symbol, timestamp DESC)`
+- Primary: `(ticker, timestamp DESC)` for real_time
+- Primary: `(ticker, date)` for ohlcv_daily
 - Secondary: `(timestamp DESC)` for time-range queries
 
 **Retention**:
@@ -180,6 +188,44 @@ poetry run alembic upgrade head
 # Rollback
 poetry run alembic downgrade -1
 ```
+
+### Historical Data Backfill
+
+Load historical OHLCV data (2017-2024) for S&P 500 companies:
+
+```bash
+# Install yfinance dependency
+poetry install
+
+# Run migrations to create ohlcv_daily table
+poetry run alembic upgrade head
+
+# Start database
+make dev-up
+
+# Run backfill (uses S&P 500 by default)
+poetry run python scripts/backfill/backfill_ohlcv_daily.py
+
+# Custom date range
+poetry run python scripts/backfill/backfill_ohlcv_daily.py --start-date 2020-01-01 --end-date 2024-12-31
+
+# Custom ticker list (one per line in file)
+poetry run python scripts/backfill/backfill_ohlcv_daily.py --tickers-file my_tickers.txt
+
+# Resume from checkpoint after interruption
+poetry run python scripts/backfill/backfill_ohlcv_daily.py  # Automatically resumes
+
+# Start fresh (ignore checkpoint)
+poetry run python scripts/backfill/backfill_ohlcv_daily.py --no-resume
+```
+
+**Features**:
+- ✅ Rate limiting (0.5s between requests)
+- ✅ Checkpoint recovery (resume after interruption)
+- ✅ Data quality validation (gaps, coverage)
+- ✅ Logs saved to `logs/backfill_ohlcv.log`
+
+**Expected time**: ~4-5 hours for 500 tickers × 7 years (with rate limiting)
 
 ### Adding New Fields
 
