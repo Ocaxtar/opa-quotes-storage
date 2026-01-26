@@ -27,8 +27,10 @@
 **Tecnologías**: TimescaleDB, PostgreSQL 14, Hypertables, Continuous Aggregates
 
 **Funcionalidad**:
-- Hypertable `quotes.quotes` con particionamiento por tiempo
-- Compresión automática datos >7 días
+- Hypertable `quotes.real_time` con particionamiento por tiempo
+- VIEW alias `quotes.quotes` para compatibilidad con componentes externos
+- Hypertable `quotes.ohlcv_daily` para históricos OHLCV (2017+)
+- Compresión automática datos >30 días
 - Continuous aggregates para estadísticas (OHLCV)
 - Retención: raw data 30 días, agregados 1 año
 
@@ -63,9 +65,9 @@
 ### 3. Hypertables con chunk_time_interval = 1 día
 
 ```sql
--- ✅ Correcto
+-- ✅ Correcto (real_time es la hypertable real)
 SELECT create_hypertable(
-    'quotes.quotes',
+    'quotes.real_time',
     'timestamp',
     chunk_time_interval => INTERVAL '1 day'
 );
@@ -96,7 +98,9 @@ SELECT create_hypertable(
 **Por qué**: [state-db-schemas.yaml.md](https://github.com/Ocaxtar/OPA_Machine/blob/main/docs/infrastructure/state-db-schemas.yaml.md) es el **source of truth** de schemas reales.
 
 **Tablas a documentar**:
-- `quotes.quotes` (cuando se implemente)
+- `quotes.real_time` (hypertable principal - tiempo real)
+- `quotes.quotes` (VIEW alias de real_time - compatibilidad)
+- `quotes.ohlcv_daily` (hypertable históricos - OHLCV 2017+)
 
 ---
 
